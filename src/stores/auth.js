@@ -21,6 +21,8 @@ export const useAuthStore = defineStore('auth', {
         console.log('Inicio de sesión exitoso:', this.user);
       } catch (error) {
         console.error('Error al iniciar sesión:', error.message);
+        // Lanzar el error para que el componente lo capture
+        throw new Error(error.message || "Error al iniciar sesión"); 
       }
     },
     // register(email, password): Usa createUserWithEmailAndPassword para registrar un nuevo usuario.
@@ -32,6 +34,8 @@ export const useAuthStore = defineStore('auth', {
         console.log('Registro exitoso:', this.user);
       } catch (error) {
         console.error('Error al registrarse:', error.message);
+         // Lanzar el error para que el componente lo capture
+         throw new Error(error.message || "Error al registrarse"); 
       }
     },
     //logout(): Usa signOut para cerrar sesión y limpiar el estado.

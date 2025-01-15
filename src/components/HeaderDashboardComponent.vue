@@ -9,6 +9,7 @@
   import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
   import { ref, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
+  import { useToast } from "vue-toastification"; // Importamos el notificador
   
   export default {
     name: 'HeaderDashboardComponent',
@@ -16,6 +17,7 @@
       const auth = getAuth();
       const router = useRouter();
       const userName = ref('');
+      const toast = useToast();
   
       // Verificar estado del usuario al montar el componente
       onMounted(() => {
@@ -32,6 +34,8 @@
       const logout = async () => {
         try {
           await signOut(auth); // Cerrar sesión en Firebase
+          // Mostrar notificación de éxito
+          toast.success(" Has cerrado Sesión");
           router.push('/login'); // Redirigir al login
         } catch (error) {
           console.error('Error al cerrar sesión:', error.message);

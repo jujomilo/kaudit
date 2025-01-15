@@ -55,24 +55,27 @@
   import { useAuthStore } from '@/stores/auth';
   import { ref } from 'vue';
   import { useRouter } from 'vue-router'; // Importamos el router para redirecciones y enlaces
-  
+  import { useToast } from "vue-toastification"; // Importamos el notificador
+
   export default {
     setup() {
       const authStore = useAuthStore();
       const router = useRouter(); // Guardamos router enuna constante lista para usar
-  
+      const toast = useToast();
       const email = ref('');
       const password = ref('');
   
       const handleRegister = async () => {
         try {
           await authStore.register(email.value, password.value);
+          // Mostrar notificación de éxito
+          toast.success("¡Registro exitoso! 🎉");
           // redirigir al login después del registro exitoso
           router.push('/login');
         } catch (error) {
           console.error('Error al registrarse:', error.message);
-          console.error('Error al registrarse:', error.message);
-          alert('Hubo un error al registrarse. Por favor, inténtalo de nuevo.');
+          toast.error("Error al registrarse inténtalo de nuevo.");
+
         }
       };
   

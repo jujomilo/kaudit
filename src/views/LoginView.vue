@@ -53,9 +53,12 @@
 import { useAuthStore } from '@/stores/auth';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router'; // Importamos router para redirigir
+import { useToast } from "vue-toastification"; // Importamos el notificador
+
 
 export default {
   setup() {
+    const toast = useToast();
     const authStore = useAuthStore(); // Usamos el store de autenticación
     const router = useRouter(); // Para manejar la redirección
 
@@ -68,9 +71,13 @@ export default {
         // Llamar a la función de login del store
         await authStore.login(email.value, password.value);
 
+        // Mostrar notificación de éxito
+        toast.success("¡Inicio de sesión exitoso! 🎉");
+
         // Redirigir al dashboard tras login exitoso
         router.push('/dashboard');
       } catch (error) {
+        toast.error("Error al iniciar sesión: Verifica tus credenciales.");
         console.error('Error al iniciar sesión:', error.message);
         errorMessage.value = 'Credenciales inválidas, por favor intenta nuevamente.';
       }
