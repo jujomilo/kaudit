@@ -1,0 +1,27 @@
+// Variables de colores
+$gray-900: #121212;
+$gray-800: #1c1c1c;
+$gray-700: #2a2a2a;
+$gray-600: #3d3d3d;
+$gray-500: #8c8c8c; // Gris intermedio para textos secundarios menos destacados
+$gray-400: #b0b0b0; // Gris claro para textos secundarios
+$gray-850: #1f1f1f; // Gris oscuro pero más claro que $gray-900
+$orange-highlight: #e95420;
+
+// Neomorfismo
+$box-shadow-light: 8px 8px 16px rgba(0, 0, 0, 0.2);
+$box-shadow-dark: -8px -8px 16px rgba(255, 255, 255, 0.05);
+
+// Estilo global
+body {
+  background-color: $gray-900;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
+
+// Clase de ejemplo
+.neomorphism {
+  background: $gray-800;
+  border-radius: 12px;
+  box-shadow: $box-shadow-light, $box-shadow-dark;
+}
