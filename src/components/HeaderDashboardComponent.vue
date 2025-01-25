@@ -1,9 +1,13 @@
 <template>
-    <header class="is-flex is-justify-content-space-between is-align-items-center">
-      <h1 class="title">Bienvenido, {{ userName }}</h1>
-      <button class="button is-danger" @click="logout">Cerrar sesión</button>
-    </header>
-  </template>
+  <header class="header-dashboard is-flex is-justify-content-space-between is-align-items-center">
+    <!-- Título del usuario -->
+    <h1 class="title">Bienvenido, {{ userName }}</h1>
+
+    <!-- Botón de cerrar sesión -->
+    <button class="button is-danger logout-button" @click="logout">Cerrar sesión</button>
+  </header>
+</template>
+
   
   <script>
   import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
@@ -51,50 +55,55 @@
   </script>
   
   <style scoped lang="scss">
-@import '@/styles/main.scss'; /* Asegúrate de importar las variables */
-
+  @import '@/styles/main.scss'; /* Asegúrate de importar las variables */
+  
 /* Estilo del header */
-header {
-  margin-bottom: 2rem;
-  padding: 1rem 2rem;
+.header-dashboard {
+  margin: 0;
+  padding: 0.8rem 1.5rem;
   border-radius: 15px;
-  background: $gray-800; /* Fondo oscuro */
-  box-shadow: $box-shadow-light, $box-shadow-dark; /* Efecto neomorfista */
+  background: $gray-800;
+  box-shadow: $box-shadow-light, $box-shadow-dark;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  justify-content: space-between; /* Separar texto y botón */
+  align-items: center; /* Centrar verticalmente todos los elementos */
+  width: 100%;
 }
 
 /* Estilo del título */
 .title {
-  font-size: 1.25rem; /* Reducimos el tamaño del texto */
-  font-family: 'Orbitron', sans-serif; /* Tipografía más radical */
-  color: $gray-400; /* Color gris claro */
-  text-shadow: 1px 1px 2px $gray-900, -1px -1px 2px $gray-500; /* Efecto de bajo relieve */
-  margin-bottom: 1rem;
-  letter-spacing: 0.1em; /* Espaciado entre letras */
+  font-size: 0.9rem;
+  font-family: 'Orbitron', sans-serif;
+  color: $orange-highlight;
+  text-shadow: 1px 1px 2px $gray-900, -1px -1px 2px $gray-500;
+  margin: 0; /* Elimina márgenes externos */
+  padding: 0 0.5rem; /* Espaciado interno a los lados */
+  line-height: 1.5; /* Asegura un buen alineado vertical */
 }
 
-/* Estilo del botón */
-button {
-  padding: 0.5rem 1.5rem;
+/* Estilo del botón de cerrar sesión */
+.logout-button {
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
   border: none;
   border-radius: 10px;
-  background: $orange-highlight; /* Color destacado */
-  box-shadow: 5px 5px 10px rgba(233, 84, 32, 0.5), -5px -5px 10px rgba(255, 133, 85, 0.3);
+  background: $orange-highlight;
+  box-shadow: 2px 2px 5px rgba(233, 84, 32, 0.4), -2px -2px 5px rgba(255, 133, 85, 0.2);
   color: #fff;
-  font-family: 'Arial', sans-serif; /* Botón más neutro */
+  font-family: 'Arial', sans-serif;
   font-weight: bold;
   transition: all 0.3s ease;
+  line-height: 1.5; /* Asegura alineación vertical similar al texto */
 }
 
-button:hover {
-  box-shadow: inset 5px 5px 10px rgba(233, 84, 32, 0.6), inset -5px -5px 10px rgba(255, 133, 85, 0.4);
+.logout-button:hover {
+  box-shadow: inset 3px 3px 5px rgba(233, 84, 32, 0.4), inset -3px -3px 5px rgba(255, 133, 85, 0.3);
   cursor: pointer;
 }
-</style>
-
+  </style>
+  
+  
+  
   
   
   
