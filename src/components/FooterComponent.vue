@@ -3,10 +3,7 @@
     <div class="footer-content">
       <img src="@/assets/Arcelormittal-Logo.png" alt="Arcelormittal Logo" class="logo" />
       <nav class="footer-links">
-        <a href="#about">Acerca de</a>
-        <a href="#services">Servicios</a>
-        <a href="#contact">Contacto</a>
-        <a href="#privacy">Política de privacidad</a>
+        <a href="#about">Departamento de Desarrollo ArcelorMittal</a>
       </nav>
       <p class="copyright">
         © 2025 ArcelorMittal. Todos los derechos reservados.

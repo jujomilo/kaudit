@@ -1,10 +1,15 @@
 import { defineStore } from 'pinia';
-import { auth } from '@/firebase'; // Importamos la instancia de Firebase Auth
+import { auth, db, storage } from '@/firebase'; // Importamos la instancia de Firebase Auth
 import {
   signInWithEmailAndPassword,
   signOut,
   createUserWithEmailAndPassword,
+  updateProfile
 } from 'firebase/auth';
+
+// Importaciones para crear colección users y poder subir la foto de usuario que vendrá del register
+import { doc, setDoc } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -26,18 +31,42 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     // register(email, password): Usa createUserWithEmailAndPassword para registrar un nuevo usuario.
-    async register(email, password) {
+    // sube la imagen que viene como payload
+    async register(email, password, profilePicture) {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        this.user = userCredential.user;
+        const user = userCredential.user;
+        let photoURL = '';
+    
+        if (profilePicture) {
+          const imageRef = storageRef(storage, `profilePictures/${user.uid}`);
+          await uploadBytes(imageRef, profilePicture);
+          photoURL = await getDownloadURL(imageRef);
+   
+    
+          await updateProfile(user, { photoURL });
+        }
+    
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.email.split('@')[0],
+          role: 'user',
+          photoURL,
+        });
+    
+        this.user = user;
         this.isAuthenticated = true;
-        console.log('Registro exitoso:', this.user);
+        console.log('Registro exitoso:', user);
+    
       } catch (error) {
         console.error('Error al registrarse:', error.message);
-         // Lanzar el error para que el componente lo capture
-         throw new Error(error.message || "Error al registrarse"); 
+        throw new Error(error.message || "Error al registrarse");
       }
     },
+    
+    
+
     //logout(): Usa signOut para cerrar sesión y limpiar el estado.
     async logout() {
       try {

@@ -32,6 +32,21 @@
                     />
                   </div>
                 </div>
+
+                <!-- NUEVO: Input para subir imagen -->
+              <div class="field">
+                <label class="label" for="profilePicture">Foto de perfil:</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="file"
+                    id="profilePicture"
+                    @change="handleFileChange"
+                    accept="image/*"
+                  />
+                </div>
+              </div>
+
                 <div class="field">
                   <div class="control">
                     <button class="button is-primary is-fullwidth">
@@ -56,6 +71,7 @@
   import { ref } from 'vue';
   import { useRouter } from 'vue-router'; // Importamos el router para redirecciones y enlaces
   import { useToast } from "vue-toastification"; // Importamos el notificador
+  import { getAuth } from "firebase/auth";
 
   export default {
     setup() {
@@ -64,11 +80,35 @@
       const toast = useToast();
       const email = ref('');
       const password = ref('');
-  
+      // referencia para la foto de usuario
+      const profilePicture = ref(null); // Aseguramos que la referencia existe
+
+      const handleFileChange = (event) => {
+      const file = event.target.files[0];
+
+      if (!file) {
+        toast.error("No se seleccionó ningún archivo.");
+        return;
+      }
+
+      // 🔥 Validación de tamaño (máx 2MB)
+      const maxSize = 2 * 1024 * 1024; // 2MB en bytes
+      if (file.size > maxSize) {
+        toast.error("La imagen es demasiado grande. Elige una de máximo 2MB.");
+        return;
+      }
+
+      profilePicture.value = file; // ✅ Solo asignamos la imagen si pasa la validación
+      };
+
+
+
       const handleRegister = async () => {
         try {
-          await authStore.register(email.value, password.value);
+          await authStore.register(email.value, password.value, profilePicture.value);
           // Mostrar notificación de éxito
+          const auth = getAuth();
+          console.log("Usuario autenticado después del registro:", auth.currentUser); // ✅ Verifica si Firebase asigna el usuario
           toast.success("¡Registro exitoso! 🎉");
           // redirigir al login después del registro exitoso
           router.push('/login');
@@ -82,6 +122,8 @@
       return {
         email,
         password,
+        profilePicture, // añadimos la referencia para la imagen
+        handleFileChange,
         handleRegister,
       };
     },

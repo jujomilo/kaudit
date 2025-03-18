@@ -24,50 +24,72 @@
   import HeaderDashboardComponent from '@/components/HeaderDashboardComponent.vue';
   import FooterComponent from '@/components/FooterComponent.vue';
   import TaskListComponent from "@/components/TaskListComponent.vue";
-  
+
+  // Importaciones para acceder a la colección y documentos de Firestore
+  import { ref, onMounted } from "vue";
+  import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+  import { db } from "@/firebase";
+
+
   export default {
     components: {
       HeaderDashboardComponent,
       FooterComponent,
       TaskListComponent,
     },
-    data() {
-    return {
-      tasks: [
-        {
-          id: 1,
-          fecha: "2025-01-15",
-          turno: "T",
-          equipo: "2",
-          responsable: "Jefe EQ1",
-          descripcion: "Revisar entrada de soldadora",
-          plazo: "2025-01-20",
-        },
-        {
-          id: 2,
-          fecha: "2025-01-16",
-          turno: "M",
-          equipo: "3",
-          responsable: "Jefe EQ2",
-          descripcion: "Comprobar salida de proceso",
-          plazo: "2025-01-21",
-        },
-      ],
+    
+    setup() {
+    const tasks = ref([]); // Almacenar las tareas
+
+    const fetchTasks = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "tasks"));
+        tasks.value = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log("Tareas obtenidas:", tasks.value);
+      } catch (error) {
+        console.error("Error obteniendo las tareas:", error);
+      }
     };
-  },
 
-  methods: {
-    completeTask(taskId) {
-       // Marcar como completada (esto será reemplazado por lógica con Firestore)
-       this.tasks = this.tasks.filter((task) => task.id !== taskId);
+    // ejecuta la función fetchTasks cuando el componente es montado
+    // esto carga las tareas desde Firestore y las almacena en la variable tasks
+    onMounted(() => {
+      fetchTasks();
+    });
 
-      // Aquí podríamos actualizar Firestore:
-      // firestore.collection("tasks").doc(taskId).update({ status: "completada" });
-      console.log(`Tarea con ID ${taskId} marcada como completada`);
-    }
+    /*
+    - Función que se llama cuando una tarea es completada
+    - Filtra el array tasks.value para eliminar la tarea con el ID correspondiente (taskId)
+    */
+    const completeTask = async (taskId) => {
+  try {
+    // Referencia al documento en Firestore
+    const taskRef = doc(db, "tasks", taskId);
+
+    // Actualizamos el campo `status` a "completed"
+    await updateDoc(taskRef, { status: "completed" });
+
+    // Filtramos la tarea localmente para actualizar la UI
+    tasks.value = tasks.value.filter((task) => task.id !== taskId);
+
+    console.log(`Tarea con ID ${taskId} marcada como completada en Firestore`);
+  } catch (error) {
+    console.error("Error actualizando la tarea en Firestore:", error);
   }
 };
-</script>
+
+     // Expone tasks y completeTask al template del componente:
+    return {
+      tasks,
+      completeTask,
+    };
+  },
+};
+
+</script> 
   
   <style scoped>
   .container {
@@ -96,6 +118,10 @@
   .title {
   text-align: center;
 }
+
+
+
 }
   </style>
+  
   
