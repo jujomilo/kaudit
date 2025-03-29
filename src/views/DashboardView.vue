@@ -9,10 +9,15 @@
         <h1 class="title has-text-light">Auditorías Pendientes</h1>
 
         <!-- Lista de tareas -->
-        <TaskListComponent
-         :tasks="tasks"
-         @complete-task="completeTask" 
-          />
+        <div v-if="audits.length > 0">
+          <ul>
+           <li v-for="audit in audits" :key="audit.id">
+              <strong>{{ audit.title }}</strong>: {{ audit.description }}
+           </li>
+         </ul>
+      </div>
+<p v-else>No tienes auditorías pendientes en este momento.</p>
+
       </div>
     </div>
     <FooterComponent />
@@ -20,76 +25,62 @@
 </template>
   
   
-  <script>
-  import HeaderDashboardComponent from '@/components/HeaderDashboardComponent.vue';
-  import FooterComponent from '@/components/FooterComponent.vue';
-  import TaskListComponent from "@/components/TaskListComponent.vue";
-
-  // Importaciones para acceder a la colección y documentos de Firestore
-  import { ref, onMounted } from "vue";
-  import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
-  import { db } from "@/firebase";
+<script>
+import HeaderDashboardComponent from '@/components/HeaderDashboardComponent.vue';
+import FooterComponent from '@/components/FooterComponent.vue';
 
 
-  export default {
-    components: {
-      HeaderDashboardComponent,
-      FooterComponent,
-      TaskListComponent,
-    },
-    
-    setup() {
-    const tasks = ref([]); // Almacenar las tareas
+// Importaciones de Firebase
+import { ref, onMounted } from "vue";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { db } from "@/firebase";
 
-    const fetchTasks = async () => {
+export default {
+  components: {
+    HeaderDashboardComponent,
+    FooterComponent,
+
+  },
+  
+  setup() {
+    const audits = ref([]); // Almacena las auditorías del usuario autenticado
+    const auth = getAuth();
+
+    // Función para obtener auditorías asignadas al usuario autenticado
+    const fetchAudits = async () => {
+      if (!auth.currentUser) {
+        console.error("No hay usuario autenticado");
+        return;
+      }
+
       try {
-        const querySnapshot = await getDocs(collection(db, "tasks"));
-        tasks.value = querySnapshot.docs.map((doc) => ({
+        const q = query(collection(db, "auditsTemplates"), where("assignedTo", "==", auth.currentUser.uid));
+        const querySnapshot = await getDocs(q);
+
+        audits.value = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("Tareas obtenidas:", tasks.value);
+
+        console.log("Auditorías obtenidas:", audits.value);
       } catch (error) {
-        console.error("Error obteniendo las tareas:", error);
+        console.error("Error obteniendo las auditorías:", error);
       }
     };
 
-    // ejecuta la función fetchTasks cuando el componente es montado
-    // esto carga las tareas desde Firestore y las almacena en la variable tasks
+    // Ejecuta la función cuando el componente se monta
     onMounted(() => {
-      fetchTasks();
+      fetchAudits();
     });
 
-    /*
-    - Función que se llama cuando una tarea es completada
-    - Filtra el array tasks.value para eliminar la tarea con el ID correspondiente (taskId)
-    */
-    const completeTask = async (taskId) => {
-  try {
-    // Referencia al documento en Firestore
-    const taskRef = doc(db, "tasks", taskId);
-
-    // Actualizamos el campo `status` a "completed"
-    await updateDoc(taskRef, { status: "completed" });
-
-    // Filtramos la tarea localmente para actualizar la UI
-    tasks.value = tasks.value.filter((task) => task.id !== taskId);
-
-    console.log(`Tarea con ID ${taskId} marcada como completada en Firestore`);
-  } catch (error) {
-    console.error("Error actualizando la tarea en Firestore:", error);
-  }
-};
-
-     // Expone tasks y completeTask al template del componente:
     return {
-      tasks,
-      completeTask,
+      audits,
     };
   },
 };
+</script>
 
-</script> 
   
   <style scoped>
   .container {
