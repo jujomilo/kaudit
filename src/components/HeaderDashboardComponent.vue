@@ -9,6 +9,12 @@
     <div class="button-group">
      
       <router-link to="/edit-profile" class="edit-profile-button">Editar Perfil</router-link>
+      
+      <router-link to="/wall" class="edit-profile-button">
+  🧱  Ver Muro
+      </router-link>
+
+
        <!-- Enlace a la vista de SuperUsuario (sólo si el usuario es superusuario)-->
        <router-link v-if="isSuperUser" to="/superuser" class="edit-profile-button">Panel Admin</router-link>
       

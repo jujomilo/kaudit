@@ -5,25 +5,61 @@
 
     <form @submit.prevent="createAudit">
       <!-- 🔹 Título de la auditoría -->
-      <div class="field">
+      <div class="field mt-4">
         <label class="label">Título</label>
         <input v-model="title" type="text" class="input" placeholder="Ejemplo: Inspección de seguridad" required>
       </div>
 
      <!-- 🔹 Descripción de la auditoría -->
-      <div class="field">
+      <div class="field mt-4">
         <label class="label">Descripción</label>
         <textarea v-model="description" class="textarea" placeholder="Explica qué debe hacerse en esta auditoría" required></textarea>
       </div>
 
+      <!-- Campos para la organización por áreas y turnos-->
+
+      <!-- Zona -->
+      <div class="field mt-4">
+        <label class="label">
+          <div class="control">
+            <div class="select i-fullwidth">
+              <select v-model="zone">
+              <option disabled value="">Selecciona una zona</option>
+              <option value="Entrada">Entrada</option>
+              <option value="Púlpito">Púlpito</option>
+              <option value="Bobinadora">Bobinadora</option>
+              <option value="Salida">salida</option>
+              <option value="Seguridad">Seguridad</option>
+              </select>
+            </div>
+          </div>
+        </label>
+      </div>
+      <!-- TURNO -->
+<div class="field mt-4">
+  <label class="label has-text-light">Turno</label>
+  <div class="control">
+    <div class="select is-fullwidth">
+      <select v-model="shift">
+        <option disabled value="">Selecciona un turno</option>
+        <option value="M">Mañana</option>
+        <option value="T">Tarde</option>
+        <option value="N">Noche</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+      <!-- Fin de Campos para la organización por áreas y turnos-->
+
       <!-- 🔹 Fecha límite -->
-      <div class="field">
+      <div class="field mt-4">
         <label class="label">Fecha Límite</label>
         <input v-model="deadline" type="date" class="input" required />
       </div>
      
       <!-- 🔹 Selección de usuarios -->
-       <div class="field">
+       <div class="field mt-4">
         <label class="label">Asignar Usuario</label>
         <div class="select is-fullwidth">
             <select v-model="assignedUser" required>
@@ -64,6 +100,9 @@ export default {
         const auth = getAuth();
         const toast = useToast();
         const router = useRouter();
+        // Variables reactivas para zona y turno
+        const zone = ref("");
+        const shift = ref("");
 
         // Cargar la lista de usuarios en Firestore filtrando solo los usarios con el role de user
         const fetchUsers = async () => {
@@ -86,7 +125,14 @@ export default {
 
         // 🔥 Función para crear la auditoría en Firestore
         const createAudit = async () => {
-            if (!title.value || !description.value || !deadline.value || !assignedUser.value) {
+            if (
+              !title.value || 
+              !description.value || 
+              !deadline.value || 
+              !assignedUser.value ||
+              !zone.value ||
+              !shift.value
+              ) {
                 toast.error("Todos los campos son obligatorios");
                 return;
             }
@@ -102,7 +148,10 @@ export default {
                 // variables añadidas
                 status: "active",
                 deadline: deadline.value,
-                createdAt: new Date()
+                createdAt: new Date(),
+                // variables turno y zona
+                zone: zone.value,   // ✅ nueva propiedad
+                shift: shift.value  // ✅ nueva propiedad
               });
 
               // Si todo ha salido bien mensaje de éxto y redireccionado de usuario a su dashboard
@@ -121,6 +170,8 @@ export default {
             deadline,
             assignedUser,
             users,
+            zone,       
+            shift,      
             createAudit // función
         };
     }

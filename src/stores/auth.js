@@ -42,8 +42,10 @@ export const useAuthStore = defineStore('auth', {
           const imageRef = storageRef(storage, `profilePictures/${user.uid}`);
           await uploadBytes(imageRef, profilePicture);
           photoURL = await getDownloadURL(imageRef);
-   
-    
+          await updateProfile(user, { photoURL });
+        } else {
+          // ✅ Avatar tipo ícono sin rostro
+          photoURL = `https://ui-avatars.com/api/?name=${email}&background=2c2c2c&color=ffffff&rounded=true&size=128`;
           await updateProfile(user, { photoURL });
         }
     
@@ -64,6 +66,32 @@ export const useAuthStore = defineStore('auth', {
         throw new Error(error.message || "Error al registrarse");
       }
     },
+    
+    // 🔄 Actualiza solo la foto de perfil sin duplicar el usuario
+async updateProfilePicture(profilePicture) {
+  try {
+    const user = auth.currentUser;
+
+    const imageRef = storageRef(storage, `profilePictures/${user.uid}/profile.jpg`);
+    await uploadBytes(imageRef, profilePicture);
+
+    const photoURL = await getDownloadURL(imageRef);
+
+    await updateProfile(user, { photoURL });
+
+    await setDoc(doc(db, 'users', user.uid), { photoURL }, { merge: true });
+
+    await user.reload();
+    this.user = auth.currentUser;
+
+    console.log("📸 Foto de perfil actualizada correctamente");
+
+  } catch (error) {
+    console.error("Error al actualizar la foto de perfil:", error.message);
+    throw new Error(error.message || "Error al actualizar la foto de perfil");
+  }
+},
+    
     
     
 

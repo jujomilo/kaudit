@@ -43,6 +43,24 @@ const routes = [
     meta: { requiresSuperUser: true }, // 🔥 Solo superusuarios pueden acceder
   },
   
+   // 🔥 Ruta para ver detalle de una auditoría/tarea por ID
+{
+  path: "/task/:id",
+  name: "TaskDetail",
+  component: () => import("@/views/TaskDetail.vue"),
+  meta: { requiresAuth: true }
+},
+
+// Ruta autenticada para el wallpost
+
+{
+  path: "/wall",
+  name: "Wall",
+  component: () => import("@/views/WallView.vue"),
+  meta: { requiresAuth: true }
+}
+
+ 
 ];
 
 
